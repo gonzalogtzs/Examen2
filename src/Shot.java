@@ -13,7 +13,7 @@ import javax.swing.ImageIcon;
  */
 public class Shot extends Sprite {
 
-    private String shot = "shot.png";
+    private String shot = "laser.png";
     private final int H_SPACE = 6;
     private final int V_SPACE = 1;
 

@@ -4,12 +4,23 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
@@ -29,6 +40,10 @@ public class Board extends JPanel implements Runnable, Commons {
     private ArrayList aliens;
     private Player player;
     private Shot shot;
+    private boolean bPause = false;
+    private boolean bCredito = false;
+    private boolean bInstrucciones = false;
+    private int iCounterPause = 0;
 
     private int alienX = 150;
     private int alienY = 5;
@@ -36,14 +51,19 @@ public class Board extends JPanel implements Runnable, Commons {
     private int deaths = 0;
 
     private boolean ingame = true;
-    private final String expl = "explosion.png";
+    private final String expl = "Explosion2.jpg";
     private final String alienpix = "alien.png";
     private String message = "Game Over";
+    
 
     private Thread animator;
 
     public Board() 
     {
+        URL urlImagenFondo = this.getClass().getResource("back.gif");
+        Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
+        (urlImagenFondo);
+        
 
         addKeyListener(new TAdapter());
         setFocusable(true);
@@ -136,16 +156,39 @@ public class Board extends JPanel implements Runnable, Commons {
       super.paint(g);
 
       g.setColor(Color.black);
-      g.fillRect(0, 0, d.width, d.height);
+      
       g.setColor(Color.green);   
 
+      
+      
+      
       if (ingame) {
-
-        g.drawLine(0, GROUND, BOARD_WIDTH, GROUND);
-        drawAliens(g);
-        drawPlayer(g);
-        drawShot(g);
-        drawBombing(g);
+            if (bCredito) {
+              g.setColor(Color.white);
+              g.drawString("Este juego fue creado por:", 20, 20);
+              g.setColor(Color.red);
+              g.drawString("Gonzalo Gutierrez", 20, 50);
+              g.setColor(Color.orange);
+              g.drawString("Isaac Siso", 20, 70);
+             }
+            else if (bInstrucciones) {
+              g.setColor(Color.white);
+              g.drawString("Instrucciones:", 20, 20);
+              g.setColor(Color.red);
+              g.drawString("Presiona 'R' para poner los creditos", 20, 50);
+              g.drawString("Despresiona 'R' para quitar los creditos", 20, 70);
+              g.setColor(Color.orange);
+              g.drawString("Presiona 'P' para poner pausa", 20, 90);
+              g.drawString("Presiona otra vez 'P' para quitar pausa", 20, 110);
+             } 
+            
+            else{
+            g.drawLine(0, GROUND, BOARD_WIDTH, GROUND);
+            drawAliens(g);
+            drawPlayer(g);
+            drawShot(g);
+            drawBombing(g);
+            }
       }
 
       Toolkit.getDefaultToolkit().sync();
@@ -297,6 +340,8 @@ public class Board extends JPanel implements Runnable, Commons {
                         b.setDestroyed(true);;
                     }
             }
+            
+            
 
             if (!b.isDestroyed()) {
                 b.setY(b.getY() + 1);   
@@ -324,6 +369,14 @@ public class Board extends JPanel implements Runnable, Commons {
                 sleep = 2;
             try {
                 Thread.sleep(sleep);
+                
+                if (bPause) {
+                    while (iCounterPause == 1) {
+                      Thread.sleep (20);  
+                    }
+                    iCounterPause = 1;
+                }
+                
             } catch (InterruptedException e) {
                 System.out.println("interrupted");
             }
@@ -336,9 +389,71 @@ public class Board extends JPanel implements Runnable, Commons {
 
         public void keyReleased(KeyEvent e) {
             player.keyReleased(e);
+            
+            if(e.getKeyCode() == KeyEvent.VK_P) {    
+                if(bPause){
+                bPause = false;
+                iCounterPause = 0;
+                }
+                else{
+                    bPause = true;
+                    iCounterPause = 0;
+                }
+            }
+            
+            
+            
+            if(e.getKeyCode() == KeyEvent.VK_I) {    
+                bInstrucciones = false;
+                bPause = false;
+                iCounterPause = 0;
+          }
+            
+            if(e.getKeyCode() == KeyEvent.VK_R) {    
+                bCredito = false;
+                bPause = false;
+                iCounterPause = 0;
+            }
+            
         }
 
         public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_G){
+            try {
+                grabarJuego();
+            } catch (IOException ex) {
+                Logger.getLogger(SpaceInvaders.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        //Al presionar C se carga el juego
+        if (e.getKeyCode() == KeyEvent.VK_C) {
+            try {
+                cargarJuego();
+            } catch (IOException ex) {
+                Logger.getLogger(SpaceInvaders.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+          
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          if(e.getKeyCode() == KeyEvent.VK_R) {    
+                bCredito = true;
+                bPause = true;
+                iCounterPause = 0;
+          }
+          if(e.getKeyCode() == KeyEvent.VK_I) {    
+                bInstrucciones = true;
+                bPause = true;
+                iCounterPause = 0;
+          }
 
           player.keyPressed(e);
 
@@ -353,5 +468,62 @@ public class Board extends JPanel implements Runnable, Commons {
             }
           }
         }
+    }
+    
+    
+    
+    
+    
+    public void grabarJuego() throws IOException {
+        PrintWriter fileOut = new PrintWriter(new FileWriter("gameData.txt"));
+
+        //se guardan variables generales
+        fileOut.println(bPause); 
+        fileOut.println(player.getX()); //Se guarda x de lolita
+        fileOut.println(player.getY());
+        fileOut.println(shot.getX());
+        fileOut.println(shot.getY());
+        
+        
+
+        
+        
+        
+        
+        
+        fileOut.close();    //Se cierra el archivo
+    }
+    public void cargarJuego() throws IOException {
+                                                                  
+        BufferedReader fileIn;
+        try {
+                fileIn = new BufferedReader(new FileReader("gameData.txt"));
+        } catch (FileNotFoundException e){
+                File puntos = new File("gameData.txt");
+                PrintWriter fileOut = new PrintWriter(puntos);
+                fileOut.println("100,demo");
+                fileOut.close();
+                fileIn = new BufferedReader(new FileReader("gameData.txt"));
+        }
+        
+        String aux = fileIn.readLine();
+        bPause = (Boolean.parseBoolean(aux)); 
+       
+        aux = fileIn.readLine();
+        player.setX((Integer.parseInt(aux))); 
+        
+        aux = fileIn.readLine();
+        player.setY((Integer.parseInt(aux)));
+        
+        aux = fileIn.readLine();
+        shot.setX((Integer.parseInt(aux))); 
+        
+        aux = fileIn.readLine();
+        shot.setY((Integer.parseInt(aux)));
+        
+        
+        
+       
+        fileIn.close();
     }
 }

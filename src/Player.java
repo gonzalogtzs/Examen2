@@ -1,4 +1,5 @@
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
@@ -14,10 +15,10 @@ import javax.swing.ImageIcon;
  */
 public class Player extends Sprite implements Commons{
 
-    private final int START_Y = 280; 
+    private final int START_Y = 420; 
     private final int START_X = 270;
 
-    private final String player = "player.png";
+    private final String player = "donk.png";
     private int width;
 
     public Player() {
@@ -51,6 +52,8 @@ public class Player extends Sprite implements Commons{
         {
             dx = 2;
         }
+        
+        
     }
 
     public void keyReleased(KeyEvent e) {
@@ -66,4 +69,21 @@ public class Player extends Sprite implements Commons{
             dx = 0;
         }
     }
+    
+    public boolean intersecta(Object objObjeto) {
+        if (objObjeto instanceof Player) {
+            Rectangle rctEsteObjeto = new Rectangle(this.getX(), this.getY(),
+                    this.START_X, this.START_Y);
+            Player aniObjeto = (Player) objObjeto;
+            Rectangle rctObjetoParam = new Rectangle(aniObjeto.getX(),
+                    aniObjeto.getY(), aniObjeto.width, aniObjeto.dx);
+            return rctEsteObjeto.intersects(rctObjetoParam);
+        } 
+        else {
+            return false;
+        }
+    }
+    
+    
+    
 }
