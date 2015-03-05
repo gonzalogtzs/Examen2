@@ -207,7 +207,7 @@ public class Board extends JPanel implements Runnable, Commons {
             //Start
             else if (bStart) {
                 
-                URL urlImagenStart = this.getClass().getResource("Inicio.jpg");
+                URL urlImagenStart = this.getClass().getResource("Didi.png");
                 Image imaImagenStart = Toolkit.getDefaultToolkit().getImage
                 (urlImagenStart);
                 graGraficaApplet.drawImage(imaImagenStart, 0, 0, 500, 500, this);
