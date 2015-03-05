@@ -40,10 +40,16 @@ public class Board extends JPanel implements Runnable, Commons {
     private ArrayList aliens;
     private Player player;
     private Shot shot;
-    private boolean bPause = false;
+    private boolean bPause = true;
     private boolean bCredito = false;
     private boolean bInstrucciones = false;
     private int iCounterPause = 0;
+    private Graphics graGraficaApplet;
+    private final SoundClip sndSonidoDisparo;
+    private final SoundClip sndSonidoPerder;
+    private final SoundClip sndSonidoIncio;
+    private Image imaImagenApplet;
+    private boolean bStart = true;
 
     private int alienX = 150;
     private int alienY = 5;
@@ -53,7 +59,7 @@ public class Board extends JPanel implements Runnable, Commons {
     private boolean ingame = true;
     private final String expl = "Explosion2.jpg";
     private final String alienpix = "alien.png";
-    private String message = "Game Over";
+    private String message = "Haz Perdido! Lo siento! :( ";
     
 
     private Thread animator;
@@ -63,7 +69,10 @@ public class Board extends JPanel implements Runnable, Commons {
         URL urlImagenFondo = this.getClass().getResource("back.gif");
         Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
         (urlImagenFondo);
-        
+        sndSonidoPerder = new SoundClip("choque.wav");
+        sndSonidoDisparo = new SoundClip("sonido.wav");
+        sndSonidoIncio = new SoundClip("inicios.mp3");
+      
 
         addKeyListener(new TAdapter());
         setFocusable(true);
@@ -151,77 +160,111 @@ public class Board extends JPanel implements Runnable, Commons {
         }
     }
 
-    public void paint(Graphics g)
+    public void paint(Graphics graGrafico)
     {
-      super.paint(g);
+        
+      super.paint(graGrafico);
 
-      g.setColor(Color.black);
+      graGrafico.setColor(Color.black);
       
-      g.setColor(Color.green);   
+      graGrafico.setColor(Color.green);
+      
+      if (imaImagenApplet == null){
+                imaImagenApplet = createImage (this.getSize().width, 
+                        this.getSize().height);
+                graGraficaApplet = imaImagenApplet.getGraphics ();
+        }
 
-      
-      
+        
       
       if (ingame) {
             if (bCredito) {
-              g.setColor(Color.white);
-              g.drawString("Este juego fue creado por:", 20, 20);
-              g.setColor(Color.red);
-              g.drawString("Gonzalo Gutierrez", 20, 50);
-              g.setColor(Color.orange);
-              g.drawString("Isaac Siso", 20, 70);
+              graGrafico.setColor(Color.white);
+              graGrafico.drawString("Este juego fue creado por:", 20, 20);
+              graGrafico.setColor(Color.red);
+              graGrafico.drawString("Gonzalo Gutierrez", 20, 50);
+              graGrafico.setColor(Color.orange);
+              graGrafico.drawString("Isaac Siso", 20, 70);
              }
             else if (bInstrucciones) {
-              g.setColor(Color.white);
-              g.drawString("Instrucciones:", 20, 20);
-              g.setColor(Color.red);
-              g.drawString("Presiona 'R' para poner los creditos", 20, 50);
-              g.drawString("Despresiona 'R' para quitar los creditos", 20, 70);
-              g.setColor(Color.orange);
-              g.drawString("Presiona 'P' para poner pausa", 20, 90);
-              g.drawString("Presiona otra vez 'P' para quitar pausa", 20, 110);
-             } 
+              graGrafico.setColor(Color.white);
+              graGrafico.drawString("Instrucciones:", 20, 20);
+              graGrafico.setColor(Color.red);
+              graGrafico.drawString("Presiona 'R' para poner los creditos", 
+                      20, 50);
+              graGrafico.drawString("Despresiona 'R' para quitar los creditos", 
+                      20, 70);
+              graGrafico.setColor(Color.orange);
+              graGrafico.drawString("Presiona 'P' para poner pausa", 20, 90);
+              graGrafico.drawString("Presiona otra vez 'P' para quitar pausa", 
+                      20, 110);
+             }
+            else if (bStart) {
+                
+                URL urlImagenStart = this.getClass().getResource("Inicio.jpg");
+                Image imaImagenStart = Toolkit.getDefaultToolkit().getImage
+                (urlImagenStart);
+                graGraficaApplet.drawImage(imaImagenStart, 0, 0, 500, 500, this);
+
+       
+        
+                graGrafico.drawImage (imaImagenApplet, 0, 0, this);
+            }
             
-            else{
-            g.drawLine(0, GROUND, BOARD_WIDTH, GROUND);
-            drawAliens(g);
-            drawPlayer(g);
-            drawShot(g);
-            drawBombing(g);
+            else {
+                URL urlImagenFondo = this.getClass().getResource("back.gif");
+                Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
+                (urlImagenFondo);
+                graGraficaApplet.drawImage(imaImagenFondo, 0, 0, 500, 500, this);
+
+
+
+                graGrafico.drawImage (imaImagenApplet, 0, 0, this);
+
+            graGrafico.drawLine(0, GROUND, BOARD_WIDTH, GROUND);
+            drawAliens(graGrafico);
+            drawPlayer(graGrafico);
+            drawShot(graGrafico);
+            drawBombing(graGrafico);
             }
       }
 
       Toolkit.getDefaultToolkit().sync();
-      g.dispose();
+      graGrafico.dispose();
     }
 
     public void gameOver()
     {
 
         Graphics g = this.getGraphics();
+        
+        URL urlImagenFondo = this.getClass().getResource("back.gif");
+        Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
+        (urlImagenFondo);
+        graGraficaApplet.drawImage(imaImagenFondo, 0, 0, 500, 500, this);
 
-        g.setColor(Color.black);
-        g.fillRect(0, 0, BOARD_WIDTH, BOARD_HEIGTH);
+        g.drawImage (imaImagenApplet, 0, 0, this);
+        
+        
+        
 
-        g.setColor(new Color(0, 32, 48));
-        g.fillRect(50, BOARD_WIDTH/2 - 30, BOARD_WIDTH-100, 50);
-        g.setColor(Color.white);
-        g.drawRect(50, BOARD_WIDTH/2 - 30, BOARD_WIDTH-100, 50);
-
-        Font small = new Font("Helvetica", Font.BOLD, 14);
+        Font small = new Font("Helvetica", Font.BOLD, 20);
         FontMetrics metr = this.getFontMetrics(small);
 
-        g.setColor(Color.white);
+        g.setColor(Color.red);
         g.setFont(small);
-        g.drawString(message, (BOARD_WIDTH - metr.stringWidth(message))/2, 
-            BOARD_WIDTH/2);
+        g.drawString(message, (500 - metr.stringWidth(message))/2, 
+            120/2);
+        g.setColor(Color.orange);
+        g.drawString("Didi esta muy triste!", (500 - metr.stringWidth
+        ("Didi esta muy triste!"))/2,200/2);
     }
 
     public void animationCycle()  {
 
         if (deaths == NUMBER_OF_ALIENS_TO_DESTROY) {
             ingame = false;
-            message = "Game won!";
+            message = "Felicidades! Ganaste!";
         }
 
         // player
@@ -333,6 +376,7 @@ public class Board extends JPanel implements Runnable, Commons {
                     bombX <= (playerX+PLAYER_WIDTH) &&
                     bombY >= (playerY) && 
                     bombY <= (playerY+PLAYER_HEIGHT) ) {
+                        sndSonidoPerder.play();
                         ImageIcon ii = 
                             new ImageIcon(this.getClass().getResource(expl));
                         player.setImage(ii.getImage());
@@ -347,6 +391,7 @@ public class Board extends JPanel implements Runnable, Commons {
                 b.setY(b.getY() + 1);   
                 if (b.getY() >= GROUND - BOMB_HEIGHT) {
                     b.setDestroyed(true);
+                    
                 }
             }
         }
@@ -360,6 +405,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
         while (ingame) {
             repaint();
+            
             animationCycle();
 
             timeDiff = System.currentTimeMillis() - beforeTime;
@@ -436,17 +482,15 @@ public class Board extends JPanel implements Runnable, Commons {
         }
           
             
-            
-            
-            
-            
-            
-            
-            
-            
+       
           if(e.getKeyCode() == KeyEvent.VK_R) {    
                 bCredito = true;
                 bPause = true;
+                iCounterPause = 0;
+          }
+          if(e.getKeyCode() == KeyEvent.VK_S) {    
+                bStart = false;
+                bPause = false;
                 iCounterPause = 0;
           }
           if(e.getKeyCode() == KeyEvent.VK_I) {    
@@ -463,8 +507,10 @@ public class Board extends JPanel implements Runnable, Commons {
           if (ingame)
           {
             if (e.isAltDown()) {
+                sndSonidoDisparo.play();
                 if (!shot.isVisible())
                     shot = new Shot(x, y);
+                    
             }
           }
         }
