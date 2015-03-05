@@ -13,15 +13,16 @@ import javax.swing.ImageIcon;
  */
 public class Shot extends Sprite {
 
-    private String shot = "laser.png";
-    private final int H_SPACE = 6;
-    private final int V_SPACE = 1;
+    private String shot = "laser.png"; // Asignandole imagen al disparo
+    private final int H_SPACE = 6; // horizontal
+    private final int V_SPACE = 1; // vertical
 
     public Shot() {
     }
 
     public Shot(int x, int y) {
-
+        
+        //Asignandole a imageicon las propiedades de la imagen
         ImageIcon ii = new ImageIcon(this.getClass().getResource(shot));
         setImage(ii.getImage());
         setX(x + H_SPACE);

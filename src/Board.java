@@ -36,48 +36,47 @@ import javax.swing.JPanel;
  */
 public class Board extends JPanel implements Runnable, Commons { 
 
-    private Dimension d;
-    private ArrayList aliens;
-    private Player player;
-    private Shot shot;
-    private boolean bPause = true;
-    private boolean bCredito = false;
-    private boolean bInstrucciones = false;
-    private int iCounterPause = 0;
-    private Graphics graGraficaApplet;
-    private final SoundClip sndSonidoDisparo;
-    private final SoundClip sndSonidoPerder;
-    private final SoundClip sndSonidoIncio;
-    private Image imaImagenApplet;
-    private boolean bStart = true;
+    private Dimension d; //Dimension lo que se va a mostrar en pantalla
+    private ArrayList aliens; // Declarando lista de aliens
+    private Player player; // Declarando objeto de la clase jugador
+    private Shot shot; // Declarando disparo de la clase shot
+    private boolean bPause = true; //declarando pausa del juego
+    private boolean bCredito = false; //Declarando creditos
+    private boolean bInstrucciones = false;//Declarando instrucciones
+    private int iCounterPause = 0; //Declarando contador de pausa
+    private Graphics graGraficaApplet; //Declarando graficador
+    private final SoundClip sndSonidoDisparo;//Sonido para disparo
+    private final SoundClip sndSonidoPerder;//Sonido para perder
+    private final SoundClip sndSonidoIncio;//Sonido de inicio
+    private Image imaImagenApplet;// Imagen para dibujar
+    private boolean bStart = true;// Variable para empezar el juego
 
-    private int alienX = 150;
-    private int alienY = 5;
-    private int direction = -1;
-    private int deaths = 0;
+    private int alienX = 150;//Posicion x de alien
+    private int alienY = 5;//Posicion y de alien
+    private int direction = -1;//Direccion
+    private int deaths = 0;//Muertes
 
-    private boolean ingame = true;
-    private final String expl = "Explosion2.jpg";
-    private final String alienpix = "alien.png";
-    private String message = "Haz Perdido! Lo siento! :( ";
+    private boolean ingame = true;//Boleana para el estado del juego
+    private final String expl = "Explosion2.jpg";//Inicializando explosion
+    private final String alienpix = "alien.png";//Inicializando alien
+    private String message = "Haz Perdido! Lo siento!";//Mensaje de juego perdido
     
 
     private Thread animator;
 
     public Board() 
     {
+        //Inicializando imagen de fondo
         URL urlImagenFondo = this.getClass().getResource("back.gif");
         Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
         (urlImagenFondo);
-        sndSonidoPerder = new SoundClip("choque.wav");
-        sndSonidoDisparo = new SoundClip("sonido.wav");
-        sndSonidoIncio = new SoundClip("inicios.mp3");
-      
-
+        sndSonidoPerder = new SoundClip("choque.wav");//Inicializando sonido perder
+        sndSonidoDisparo = new SoundClip("sonido.wav");//Sonido disparo     
+        sndSonidoIncio = new SoundClip("inicios.mp3");//Sonido inicio
         addKeyListener(new TAdapter());
         setFocusable(true);
-        d = new Dimension(BOARD_WIDTH, BOARD_HEIGTH);
-        setBackground(Color.black);
+        d = new Dimension(BOARD_WIDTH, BOARD_HEIGTH);//Dimension del frame
+        setBackground(Color.black);//Color de fondo
 
         gameInit();
         setDoubleBuffered(true);
@@ -90,8 +89,9 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void gameInit() {
 
-        aliens = new ArrayList();
+        aliens = new ArrayList(); //Lista de aliens
 
+        //Agregando los objetos aliens a la lista alien
         ImageIcon ii = new ImageIcon(this.getClass().getResource(alienpix));
 
         for (int i=0; i < 4; i++) {
@@ -118,10 +118,12 @@ public class Board extends JPanel implements Runnable, Commons {
         while (it.hasNext()) {
             Alien alien = (Alien) it.next();
 
+            //Aparicion de alien
             if (alien.isVisible()) {
                 g.drawImage(alien.getImage(), alien.getX(), alien.getY(), this);
             }
 
+            //Muerte de alien
             if (alien.isDying()) {
                 alien.die();
             }
@@ -130,21 +132,24 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void drawPlayer(Graphics g) {
 
+        //Aparicion de jugador
         if (player.isVisible()) {
             g.drawImage(player.getImage(), player.getX(), player.getY(), this);
         }
-
+        //Muerte de jugador
         if (player.isDying()) {
             player.die();
             ingame = false;
         }
     }
 
+    //Dibujando el disparo
     public void drawShot(Graphics g) {
         if (shot.isVisible())
             g.drawImage(shot.getImage(), shot.getX(), shot.getY(), this);
     }
 
+    //Dibujando bombas de los aliens
     public void drawBombing(Graphics g) {
 
         Iterator i3 = aliens.iterator();
@@ -174,10 +179,9 @@ public class Board extends JPanel implements Runnable, Commons {
                         this.getSize().height);
                 graGraficaApplet = imaImagenApplet.getGraphics ();
         }
-
-        
       
       if (ingame) {
+          //Creditos del juego
             if (bCredito) {
               graGrafico.setColor(Color.white);
               graGrafico.drawString("Este juego fue creado por:", 20, 20);
@@ -186,6 +190,7 @@ public class Board extends JPanel implements Runnable, Commons {
               graGrafico.setColor(Color.orange);
               graGrafico.drawString("Isaac Siso", 20, 70);
              }
+            //Instrucciones
             else if (bInstrucciones) {
               graGrafico.setColor(Color.white);
               graGrafico.drawString("Instrucciones:", 20, 20);
@@ -199,15 +204,13 @@ public class Board extends JPanel implements Runnable, Commons {
               graGrafico.drawString("Presiona otra vez 'P' para quitar pausa", 
                       20, 110);
              }
+            //Start
             else if (bStart) {
                 
                 URL urlImagenStart = this.getClass().getResource("Inicio.jpg");
                 Image imaImagenStart = Toolkit.getDefaultToolkit().getImage
                 (urlImagenStart);
                 graGraficaApplet.drawImage(imaImagenStart, 0, 0, 500, 500, this);
-
-       
-        
                 graGrafico.drawImage (imaImagenApplet, 0, 0, this);
             }
             
@@ -216,8 +219,6 @@ public class Board extends JPanel implements Runnable, Commons {
                 Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
                 (urlImagenFondo);
                 graGraficaApplet.drawImage(imaImagenFondo, 0, 0, 500, 500, this);
-
-
 
                 graGrafico.drawImage (imaImagenApplet, 0, 0, this);
 
@@ -235,22 +236,17 @@ public class Board extends JPanel implements Runnable, Commons {
 
     public void gameOver()
     {
-
+ 
         Graphics g = this.getGraphics();
         
         URL urlImagenFondo = this.getClass().getResource("back.gif");
         Image imaImagenFondo = Toolkit.getDefaultToolkit().getImage
         (urlImagenFondo);
         graGraficaApplet.drawImage(imaImagenFondo, 0, 0, 500, 500, this);
-
-        g.drawImage (imaImagenApplet, 0, 0, this);
-        
-        
-        
-
+        g.drawImage (imaImagenApplet, 0, 0, this);  
+        //Detalles de la tipografia
         Font small = new Font("Helvetica", Font.BOLD, 20);
         FontMetrics metr = this.getFontMetrics(small);
-
         g.setColor(Color.red);
         g.setFont(small);
         g.drawString(message, (500 - metr.stringWidth(message))/2, 
@@ -271,7 +267,7 @@ public class Board extends JPanel implements Runnable, Commons {
 
         player.act();
 
-        // shot
+        // Colision 
         if (shot.isVisible()) {
             Iterator it = aliens.iterator();
             int shotX = shot.getX();
@@ -332,7 +328,6 @@ public class Board extends JPanel implements Runnable, Commons {
             }
         }
 
-
         Iterator it = aliens.iterator();
 
         while (it.hasNext()) {
@@ -385,8 +380,6 @@ public class Board extends JPanel implements Runnable, Commons {
                     }
             }
             
-            
-
             if (!b.isDestroyed()) {
                 b.setY(b.getY() + 1);   
                 if (b.getY() >= GROUND - BOMB_HEIGHT) {
@@ -446,9 +439,7 @@ public class Board extends JPanel implements Runnable, Commons {
                     iCounterPause = 0;
                 }
             }
-            
-            
-            
+                
             if(e.getKeyCode() == KeyEvent.VK_I) {    
                 bInstrucciones = false;
                 bPause = false;
@@ -481,8 +472,6 @@ public class Board extends JPanel implements Runnable, Commons {
             }
         }
           
-            
-       
           if(e.getKeyCode() == KeyEvent.VK_R) {    
                 bCredito = true;
                 bPause = true;
@@ -515,29 +504,17 @@ public class Board extends JPanel implements Runnable, Commons {
           }
         }
     }
-    
-    
-    
-    
-    
+       
     public void grabarJuego() throws IOException {
         PrintWriter fileOut = new PrintWriter(new FileWriter("gameData.txt"));
 
         //se guardan variables generales
         fileOut.println(bPause); 
         fileOut.println(player.getX()); //Se guarda x de lolita
-        fileOut.println(player.getY());
+        fileOut.println(player.getY()); //Se guarda y
         fileOut.println(shot.getX());
         fileOut.println(shot.getY());
-        
-        
-
-        
-        
-        
-        
-        
-        fileOut.close();    //Se cierra el archivo
+        fileOut.close();//Se cierra el archivo
     }
     public void cargarJuego() throws IOException {
                                                                   
@@ -567,9 +544,6 @@ public class Board extends JPanel implements Runnable, Commons {
         aux = fileIn.readLine();
         shot.setY((Integer.parseInt(aux)));
         
-        
-        
-       
         fileIn.close();
     }
 }

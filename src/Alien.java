@@ -16,7 +16,7 @@ public class Alien extends Sprite {
     private Bomb bomb;
     private final String shot = "alien.png";
 
-    public Alien(int x, int y) {
+    public Alien(int x, int y) { 
         this.x = x;
         this.y = y;
 

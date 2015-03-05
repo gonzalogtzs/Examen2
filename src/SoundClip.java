@@ -8,7 +8,7 @@
  * @version 1.0
  * @date 2/11/2015
  */
-
+// Se implementa los imports para permitir la reproduccion de sondo
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.AudioInputStream;
@@ -19,7 +19,7 @@ import java.net.URL;
 
 public class SoundClip {
 
-	private AudioInputStream sample;
+	private AudioInputStream sample; 
 	private Clip clip;
 	private boolean looping = false;
 	private int repeat = 0;

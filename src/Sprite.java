@@ -13,11 +13,11 @@ import java.awt.Image;
  */
 public class Sprite {
 
-        private boolean visible;
-        private Image image;
+        private boolean visible; //Variable boleana para la visibilidad del sprite
+        private Image image; //Imagen del sprite
         protected int x;
         protected int y;
-        protected boolean dying;
+        protected boolean dying; // Boleana de estado del jugador
         protected int dx;
 
         public Sprite() {

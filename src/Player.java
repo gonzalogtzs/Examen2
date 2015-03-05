@@ -15,10 +15,10 @@ import javax.swing.ImageIcon;
  */
 public class Player extends Sprite implements Commons{
 
-    private final int START_Y = 420; 
-    private final int START_X = 270;
+    private final int START_Y = 420; //Posicion en y
+    private final int START_X = 270; //Posicion en x 
 
-    private final String player = "Jobmonkey.png";
+    private final String player = "Jobmonkey.png";// Imagen del jugador
     
     
     private int width;
@@ -42,7 +42,7 @@ public class Player extends Sprite implements Commons{
             x = BOARD_WIDTH - 2*width;
     }
 
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e) { //Movimiento del jugador
         int key = e.getKeyCode();
 
         if (key == KeyEvent.VK_LEFT)
@@ -72,7 +72,7 @@ public class Player extends Sprite implements Commons{
         }
     }
     
-    public boolean intersecta(Object objObjeto) {
+    public boolean intersecta(Object objObjeto) {//Interseccion
         if (objObjeto instanceof Player) {
             Rectangle rctEsteObjeto = new Rectangle(this.getX(), this.getY(),
                     this.START_X, this.START_Y);
