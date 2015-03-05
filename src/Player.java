@@ -18,7 +18,8 @@ public class Player extends Sprite implements Commons{
     private final int START_Y = 420; 
     private final int START_X = 270;
 
-    private final String player = "player.png";
+    private final String player = "Jobmonkey.png";
+    
     private int width;
 
     public Player() {
